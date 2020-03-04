@@ -116,9 +116,7 @@ public class GameVisualizer extends JPanel
     {
         if (value < min)
             return min;
-        if (value > max)
-            return max;
-        return value;
+        return Math.min(value, max);
     }
     
     private void moveRobot(double velocity, double angularVelocity, double duration)
