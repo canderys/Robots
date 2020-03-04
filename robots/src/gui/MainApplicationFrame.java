@@ -147,6 +147,14 @@ public class MainApplicationFrame extends JFrame
             });
             testMenu.add(addLogMessageItem);
         }
+
+        {
+            JMenuItem addLogMessageItem = new JMenuItem("Другое сообщение", KeyEvent.VK_S);
+            addLogMessageItem.addActionListener((event) -> {
+                Logger.debug("Kek");
+            });
+            testMenu.add(addLogMessageItem);
+        }
         return testMenu;
     }
 
