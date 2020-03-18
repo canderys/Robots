@@ -12,10 +12,13 @@ import java.util.LinkedList;
  * их лишь накапливает. Надо же, чтобы количество сообщений в логе было ограничено 
  * величиной m_iQueueLength (т.е. реально нужна очередь сообщений 
  * ограниченного размера)
+ * 3.Уезжает за пределы экрана(пофиксить)
+ * 4.При нажатии на крестик уведомление об уверенности(да уверен, нет не закрывать)+ 
+ * меню -> exit -> ?(тоже самое уведомление) + разная локализация(Resourse bundle)
  */
 public class LogWindowSource
 {
-    private int m_iQueueLength;
+    private int m_iQueueLength;	
     
     private LinkedList<LogEntry> m_messages;
     private final ArrayList<LogChangeListener> m_listeners;

@@ -1,15 +1,22 @@
 package gui;
 
 import java.awt.BorderLayout;
+
 import java.awt.EventQueue;
 import java.awt.TextArea;
 
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class LogWindow extends JInternalFrame implements LogChangeListener
 {
@@ -29,6 +36,21 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
         getContentPane().add(panel);
         pack();
         updateLogContent();
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.addInternalFrameListener(new InternalFrameAdapter(){
+        	public void internalFrameClosing(InternalFrameEvent e) {
+        		JInternalFrame frame = (JInternalFrame)e.getSource();
+                int result = JOptionPane.showConfirmDialog(
+                        frame,
+                        "Are you sure you want to exit the application?",
+                        "Exit Application",
+                        JOptionPane.YES_NO_OPTION);
+             
+                    if (result == JOptionPane.YES_OPTION) {
+                        frame.dispose();
+                    }
+        	}
+        });
     }
 
     private void updateLogContent()
