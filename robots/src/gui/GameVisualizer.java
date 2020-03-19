@@ -209,11 +209,11 @@ public class GameVisualizer extends JPanel
 		        g.setColor(Color.MAGENTA);
 		        fillOval(g, robotCenterX + i * width, robotCenterY + j * height, 30, 10);
 		        g.setColor(Color.BLACK);
-		        drawOval(g, robotCenterX + i * width, robotCenterY+ j * height, 30, 10);
+		        drawOval(g, robotCenterX + i * width, robotCenterY + j * height, 30, 10);
 		        g.setColor(Color.WHITE);
-		        fillOval(g, robotCenterX  + 10 + i * width, robotCenterY+ j * height, 5, 5);
+		        fillOval(g, robotCenterX  + 10 + i * width, robotCenterY + j * height, 5, 5);
 		        g.setColor(Color.BLACK);
-		        drawOval(g, robotCenterX  + 10 + i * width, robotCenterY+ j * height, 5, 5);
+		        drawOval(g, robotCenterX  + 10 + i * width, robotCenterY + j * height, 5, 5);
         	}
     }
     
