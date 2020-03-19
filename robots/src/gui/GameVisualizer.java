@@ -8,6 +8,7 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -61,6 +62,16 @@ public class GameVisualizer extends JPanel
             }
         });
         setDoubleBuffered(true);
+    }
+
+    public RobotState getRobotState()
+    {
+        return new RobotState(m_robotPositionX, m_robotPositionY, m_robotDirection);
+    }
+
+    public Point2D.Double getTargetCoordinates()
+    {
+        return new Point2D.Double(m_targetPositionX, m_targetPositionY);
     }
 
     protected void setTargetPosition(Point p)

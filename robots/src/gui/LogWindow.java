@@ -1,9 +1,6 @@
 package gui;
 
-import java.awt.BorderLayout;
-
-import java.awt.EventQueue;
-import java.awt.TextArea;
+import java.awt.*;
 
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -55,6 +52,11 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
         }
         m_logContent.setText(content.toString());
         m_logContent.invalidate();
+    }
+
+    public Iterable<LogEntry> getLogInfo()
+    {
+        return m_logSource.all();
     }
     
     @Override

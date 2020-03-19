@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.geom.Point2D;
 import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
@@ -30,5 +31,15 @@ public class GameWindow extends JInternalFrame
         		resourceBundle.getString("exitAppTitle"))
         );
         pack();
+    }
+
+    public RobotState getRobotState()
+    {
+        return m_visualizer.getRobotState();
+    }
+
+    public Point2D.Double getTargerCoordinates()
+    {
+        return m_visualizer.getTargetCoordinates();
     }
 }
