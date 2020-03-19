@@ -31,7 +31,7 @@ public class GameVisualizer extends JPanel
     private volatile int m_targetPositionY = 100;
     
     private static final double maxVelocity = 0.1; 
-    private static final double maxAngularVelocity = 0.001; 
+    private static final double maxAngularVelocity = 0.0025; 
     
     public GameVisualizer() 
     {
@@ -137,8 +137,23 @@ public class GameVisualizer extends JPanel
         {
             newY = m_robotPositionY + velocity * duration * Math.sin(m_robotDirection);
         }
+        
+        if (newX > getWidth())
+        	newX -= getWidth();
+        else
+        	if (newX < 0)
+        		newX = getWidth() + newX;
+        
         m_robotPositionX = newX;
+        
+        if (newY > getHeight())
+        	newY -= getHeight();
+        else
+        	if (newY < 0)
+        		newY = getHeight() + newY;
+        
         m_robotPositionY = newY;
+        
         double newDirection = asNormalizedRadians(m_robotDirection + angularVelocity * duration); 
         m_robotDirection = newDirection;
     }
@@ -184,16 +199,22 @@ public class GameVisualizer extends JPanel
     {
         int robotCenterX = round(m_robotPositionX); 
         int robotCenterY = round(m_robotPositionY);
-        AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY); 
-        g.setTransform(t);
-        g.setColor(Color.MAGENTA);
-        fillOval(g, robotCenterX, robotCenterY, 30, 10);
-        g.setColor(Color.BLACK);
-        drawOval(g, robotCenterX, robotCenterY, 30, 10);
-        g.setColor(Color.WHITE);
-        fillOval(g, robotCenterX  + 10, robotCenterY, 5, 5);
-        g.setColor(Color.BLACK);
-        drawOval(g, robotCenterX  + 10, robotCenterY, 5, 5);
+        for (int i = -1; i <= 1; ++i)
+        	for (int j = -1; j <= 1; ++j)
+        	{
+        		int width = getWidth();
+        		int height = getHeight();
+        		AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX + i * width, robotCenterY + j * height); 
+                g.setTransform(t);
+		        g.setColor(Color.MAGENTA);
+		        fillOval(g, robotCenterX + i * width, robotCenterY + j * height, 30, 10);
+		        g.setColor(Color.BLACK);
+		        drawOval(g, robotCenterX + i * width, robotCenterY+ j * height, 30, 10);
+		        g.setColor(Color.WHITE);
+		        fillOval(g, robotCenterX  + 10 + i * width, robotCenterY+ j * height, 5, 5);
+		        g.setColor(Color.BLACK);
+		        drawOval(g, robotCenterX  + 10 + i * width, robotCenterY+ j * height, 5, 5);
+        	}
     }
     
     private void drawTarget(Graphics2D g, int x, int y)
