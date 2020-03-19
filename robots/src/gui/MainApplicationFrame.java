@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -17,9 +19,11 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import Localization.ResourceBundleLoader;
 import log.Logger;
 
 /**
@@ -31,6 +35,8 @@ import log.Logger;
 public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final static ResourceBundle resourceBundle = ResourceBundleLoader.
+    													load("MainApplicationFrame");
     
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
@@ -40,34 +46,26 @@ public class MainApplicationFrame extends JFrame
         setBounds(inset, inset,
             screenSize.width  - inset*2,
             screenSize.height - inset*2);
+        this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        ConfirmDialog dialog = new ConfirmDialog();
+        this.addWindowListener(dialog.ShowConfirmDialogJFrame(
+        		resourceBundle.getString("exitMessage"), 
+        		resourceBundle.getString("exitAppTitle"))
+        );
 
         setContentPane(desktopPane);
         
         
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
+        
+        
 
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400,  400);
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
-        this.addWindowListener( new WindowAdapter()
-        {
-            public void windowClosing(WindowEvent e)
-            {
-                JFrame frame = (JFrame)e.getSource();
-         
-                int result = JOptionPane.showConfirmDialog(
-                    frame,
-                    "Are you sure you want to exit the application?",
-                    "Exit Application",
-                    JOptionPane.YES_NO_OPTION);
-         
-                if (result == JOptionPane.YES_OPTION)
-                    frame.dispose();
-            }
-        });
     }
     
     protected LogWindow createLogWindow()
@@ -77,7 +75,7 @@ public class MainApplicationFrame extends JFrame
         logWindow.setSize(300, 800);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
-        Logger.debug("Протокол работает");
+        Logger.debug(resourceBundle.getString("LogWindowMessage"));
         return logWindow;
     }
     
@@ -121,21 +119,24 @@ public class MainApplicationFrame extends JFrame
         JMenuBar menuBar = new JMenuBar();
         JMenu lookAndFeelMenu = createLookAndFeel();
         JMenu testMenu = createTestMenu();
+        JMenuItem exitMenu = createExitMenu();
 
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
+        menuBar.add(exitMenu);
         return menuBar;
     }
 
     private JMenu createLookAndFeel()
     {
-        JMenu lookAndFeelMenu = new JMenu("Режим отображения");
+        JMenu lookAndFeelMenu = new JMenu(resourceBundle.getString("titleViewMode"));
         lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
         lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(
-                "Управление режимом отображения приложения");
+        		resourceBundle.getString("controlViewMode"));
 
         {
-            JMenuItem systemLookAndFeel = new JMenuItem("Системная схема", KeyEvent.VK_S);
+            JMenuItem systemLookAndFeel = new JMenuItem(resourceBundle.getString("systemLookAndFeel"), 
+            		KeyEvent.VK_S);
             systemLookAndFeel.addActionListener((event) -> {
                 setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 this.invalidate();
@@ -144,7 +145,8 @@ public class MainApplicationFrame extends JFrame
         }
 
         {
-            JMenuItem crossplatformLookAndFeel = new JMenuItem("Универсальная схема", KeyEvent.VK_S);
+            JMenuItem crossplatformLookAndFeel = new JMenuItem(resourceBundle.getString("crossplatformLookAndFeel"), 
+            		KeyEvent.VK_S);
             crossplatformLookAndFeel.addActionListener((event) -> {
                 setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
                 this.invalidate();
@@ -156,27 +158,38 @@ public class MainApplicationFrame extends JFrame
 
     private JMenu createTestMenu()
     {
-        JMenu testMenu = new JMenu("Тесты");
+        JMenu testMenu = new JMenu(resourceBundle.getString("testMenuTitle"));
         testMenu.setMnemonic(KeyEvent.VK_T);
-        testMenu.getAccessibleContext().setAccessibleDescription(
-                "Тестовые команды");
-
+        testMenu.getAccessibleContext().setAccessibleDescription(resourceBundle.getString("testCommands"));
         {
-            JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
+            JMenuItem addLogMessageItem = new JMenuItem(resourceBundle.getString("testMessageLog"), KeyEvent.VK_S);
             addLogMessageItem.addActionListener((event) -> {
-                Logger.debug("Новая строка");
+                Logger.debug(resourceBundle.getString("testDebugMessageLog"));
             });
             testMenu.add(addLogMessageItem);
         }
 
         {
-            JMenuItem addLogMessageItem = new JMenuItem("Другое сообщение", KeyEvent.VK_S);
+            JMenuItem addLogMessageItem = new JMenuItem(resourceBundle.getString("testAnotherLog"), KeyEvent.VK_S);
             addLogMessageItem.addActionListener((event) -> {
-                Logger.debug("Kek");
+                Logger.debug(resourceBundle.getString("testDebugAnotherLog"));
             });
             testMenu.add(addLogMessageItem);
         }
         return testMenu;
+    }
+    
+    private JMenuItem createExitMenu()
+    {
+    	JMenuItem exitMenu = new JMenuItem(resourceBundle.getString("exitMenuTitle"));
+    	exitMenu.setMnemonic(KeyEvent.VK_S);
+    	ConfirmDialog dialog = new ConfirmDialog();
+    	exitMenu.addActionListener((event)-> {dialog.ShowConfirmDialog(
+        		resourceBundle.getString("exitMessage"), 
+        		resourceBundle.getString("exitAppTitle"),
+    			this, 
+    			FrameType.JFrame);});
+    	return exitMenu;
     }
 
     private void setLookAndFeel(String className)
