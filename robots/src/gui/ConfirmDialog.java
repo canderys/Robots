@@ -30,10 +30,13 @@ public class ConfirmDialog {
         		null, options, options[1]);
         
             if (result == JOptionPane.YES_OPTION) {
-            	if(frameType == FrameType.JFrame)
-            		((JFrame) frame).dispose();
-            	else
-            		((JInternalFrame) frame).dispose();
+            	if(frameType == FrameType.JFrame) {
+					((JFrame) frame).dispose();
+					System.exit(0);
+				}
+            	else {
+					((JInternalFrame) frame).dispose();
+				}
             }
 	}
 	public InternalFrameAdapter ShowConfirmDialogJInternalFrame(String exitMessage, String exitTitle)

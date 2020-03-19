@@ -20,9 +20,8 @@ public class LogWindowSource
 {
     private int m_iQueueLength;	
     
-    private LinkedList<LogEntry> m_messages;
+    private final LinkedList<LogEntry> m_messages;
     private final ArrayList<LogChangeListener> m_listeners;
-    private volatile LogChangeListener[] m_activeListeners;
     
     public LogWindowSource(int iQueueLength) 
     {
@@ -36,7 +35,6 @@ public class LogWindowSource
         synchronized(m_listeners)
         {
             m_listeners.add(listener);
-            m_activeListeners = null;
         }
     }
     
@@ -45,33 +43,26 @@ public class LogWindowSource
         synchronized(m_listeners)
         {
             m_listeners.remove(listener);
-            m_activeListeners = null;
         }
     }
     
     public void append(LogLevel logLevel, String strMessage)
     {
         LogEntry entry = new LogEntry(logLevel, strMessage);
-        m_messages.add(entry);
-        if (m_messages.size() > m_iQueueLength)
+        synchronized (m_messages)
         {
-            m_messages.removeFirst();
-        }
-        LogChangeListener [] activeListeners = m_activeListeners;
-        if (activeListeners == null)
-        {
-            synchronized (m_listeners)
+            m_messages.add(entry);
+            if (m_messages.size() > m_iQueueLength)
             {
-                if (m_activeListeners == null)
-                {
-                    activeListeners = m_listeners.toArray(new LogChangeListener [0]);
-                    m_activeListeners = activeListeners;
-                }
+                m_messages.removeFirst();
             }
         }
-        for (LogChangeListener listener : activeListeners)
+        synchronized (m_listeners)
         {
-            listener.onLogChanged();
+            for (LogChangeListener listener : m_listeners)
+            {
+                listener.onLogChanged();
+            }
         }
     }
     
