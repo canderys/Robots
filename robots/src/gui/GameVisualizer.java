@@ -36,32 +36,17 @@ public class GameVisualizer extends JPanel
     
     public GameVisualizer() 
     {
-        m_timer.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                onRedrawEvent();
-            }
-        }, 0, 50);
-        m_timer.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                onModelUpdateEvent();
-            }
-        }, 0, 10);
-        addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mouseClicked(MouseEvent e)
-            {
-                setTargetPosition(e.getPoint());
-                repaint();
-            }
-        });
-        setDoubleBuffered(true);
+        setUp();
+    }
+
+    public GameVisualizer(double robotX, double robotY, double direction, double targerX, double targerY)
+    {
+        m_robotPositionX = robotX;
+        m_robotPositionY = robotY;
+        m_robotDirection = direction;
+        m_targetPositionX = (int) targerX;
+        m_targetPositionY = (int) targerY;
+        setUp();
     }
 
     public RobotState getRobotState()
@@ -236,5 +221,35 @@ public class GameVisualizer extends JPanel
         fillOval(g, x, y, 5, 5);
         g.setColor(Color.BLACK);
         drawOval(g, x, y, 5, 5);
+    }
+
+    private void setUp()
+    {
+        m_timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                onRedrawEvent();
+            }
+        }, 0, 50);
+        m_timer.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                onModelUpdateEvent();
+            }
+        }, 0, 10);
+        addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                setTargetPosition(e.getPoint());
+                repaint();
+            }
+        });
+        setDoubleBuffered(true);
     }
 }
