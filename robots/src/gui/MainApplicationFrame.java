@@ -3,6 +3,8 @@ package gui;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.JDesktopPane;
@@ -18,6 +20,7 @@ import javax.swing.WindowConstants;
 
 import Localization.ResourceBundleLoader;
 import log.Logger;
+import serialization.IJsonSavable;
 
 /**
  * Что требуется сделать:
@@ -25,11 +28,13 @@ import log.Logger;
  * Следует разделить его на серию более простых методов (или вообще выделить отдельный класс).
  *
  */
-public class MainApplicationFrame extends JFrame
+public class MainApplicationFrame extends JFrame implements IJsonSavable
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final static ResourceBundle resourceBundle = ResourceBundleLoader.
     													load("MainApplicationFrame");
+
+    private final List<IJsonSavable> saveOnClose = new ArrayList<>();
     
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
@@ -51,12 +56,13 @@ public class MainApplicationFrame extends JFrame
         
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
-        
+        saveOnClose.add(logWindow);
         
 
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400,  400);
         addWindow(gameWindow);
+        saveOnClose.add(gameWindow);
 
         setJMenuBar(generateMenuBar());
     }
@@ -197,5 +203,18 @@ public class MainApplicationFrame extends JFrame
         {
             // just ignore
         }
+    }
+
+    @Override
+    public void saveJSON() {
+        for (IJsonSavable item : saveOnClose)
+        {
+            item.saveJSON();
+        }
+    }
+
+    @Override
+    public String getSavePath() {
+        return "saves/";
     }
 }

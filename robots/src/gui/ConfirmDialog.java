@@ -32,6 +32,8 @@ public class ConfirmDialog {
         
             if (result == JOptionPane.YES_OPTION) {
             	if(frameType == FrameType.JFrame) {
+            		if(frame instanceof IJsonSavable)
+            			((IJsonSavable) frame).saveJSON();
 					((JFrame) frame).dispose();
 					System.exit(0);
 				}
