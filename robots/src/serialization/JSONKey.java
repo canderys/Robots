@@ -15,7 +15,8 @@ public enum JSONKey
     TargetY("targetY"),
     LogInfo("logInfo"),
     LogField("LogField"),
-    GameField("GameField");
+    GameField("GameField"),
+    MainFrame("MainFrame");
 
     public String key;
 

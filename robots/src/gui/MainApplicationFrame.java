@@ -20,7 +20,9 @@ import javax.swing.WindowConstants;
 
 import Localization.ResourceBundleLoader;
 import log.Logger;
+import serialization.FieldInfo;
 import serialization.IJsonSavable;
+import serialization.JSONSaveLoader;
 
 /**
  * Что требуется сделать:
@@ -207,6 +209,9 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable
 
     @Override
     public void saveJSON() {
+        JSONSaveLoader saver = new JSONSaveLoader();
+        FieldInfo info = saver.getMainFrameInfo(this);
+        saver.saveMainFrame(getSavePath(), info);
         for (IJsonSavable item : saveOnClose)
         {
             item.saveJSON();
@@ -215,6 +220,6 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable
 
     @Override
     public String getSavePath() {
-        return "saves/";
+        return "saves/MainFrame.json";
     }
 }

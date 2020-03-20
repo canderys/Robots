@@ -2,6 +2,7 @@ package serialization;
 
 import gui.GameWindow;
 import gui.LogWindow;
+import gui.MainApplicationFrame;
 import gui.RobotState;
 import log.LogEntry;
 
@@ -42,6 +43,17 @@ public class BasicSaver
 
         return new GameFieldInfo(x, y, size.height, size.width, isIcon,
                 isMaximum, state.x, state.y, state.direction, target.x, target.y);
+    }
+
+    public FieldInfo getMainFrameInfo(MainApplicationFrame window)
+    {
+        int x = window.getX();
+        int y = window.getY();
+        Dimension size = window.getSize();
+        //Не знаю, есть ли у JFrame аналоги isIcon, IsMaximal, так что бусть будет false
+        boolean isIcon = false;
+        boolean isMaximum = false;
+        return new FieldInfo(x, y, size.height, size.width, isIcon, isMaximum);
     }
 
 }

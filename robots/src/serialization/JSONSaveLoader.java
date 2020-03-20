@@ -16,20 +16,6 @@ import java.util.LinkedList;
 
 public class JSONSaveLoader extends BasicSaver
 {
-    public void save(String filename, GameFieldInfo gameInfo, LogFieldInfo logInfo)
-    {
-        JSONObject mainObj = new JSONObject();
-        mainObj.put(JSONKey.GameField, prepareGameFieldInfo(gameInfo));
-        mainObj.put(JSONKey.LogField, prepareLogFieldInfo(logInfo));
-
-        try(FileWriter file = new FileWriter(filename))
-        {
-            file.write(mainObj.toJSONString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void save(String filename, GameFieldInfo gameInfo)
     {
         JSONObject mainObj = new JSONObject();
@@ -47,6 +33,19 @@ public class JSONSaveLoader extends BasicSaver
     {
         JSONObject mainObj = new JSONObject();
         mainObj.put(JSONKey.LogField, prepareLogFieldInfo(logInfo));
+
+        try(FileWriter file = new FileWriter(filename))
+        {
+            file.write(mainObj.toJSONString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveMainFrame(String filename, FieldInfo mainFrameInfo)
+    {
+        JSONObject mainObj = new JSONObject();
+        mainObj.put(JSONKey.MainFrame, prepareFieldInfo(mainFrameInfo));
 
         try(FileWriter file = new FileWriter(filename))
         {
@@ -100,6 +99,24 @@ public class JSONSaveLoader extends BasicSaver
                 logData.add(new LogEntry(level, message));
             }
             return new LogFieldInfo(fieldInfo, logData);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public FieldInfo loadMainFrameInfo(String filename)
+    {
+        JSONParser parser = new JSONParser();
+        try (Reader reader = new FileReader(filename))
+        {
+            JSONObject mainObj = (JSONObject) parser.parse(reader);
+            JSONObject mainFrameObj = (JSONObject) mainObj.get(JSONKey.MainFrame);
+            return parseFieldInfo(mainFrameObj);
 
         } catch (IOException e) {
             e.printStackTrace();
