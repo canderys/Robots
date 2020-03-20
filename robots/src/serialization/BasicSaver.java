@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 
-public class Saver
+public class BasicSaver
 {
     public LogFieldInfo getLogFieldInfo(LogWindow window)
     {

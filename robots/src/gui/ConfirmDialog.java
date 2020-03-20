@@ -14,6 +14,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import Localization.ResourceBundleLoader;
+import serialization.IJsonSavable;
 
 public class ConfirmDialog {
 	
@@ -35,6 +36,10 @@ public class ConfirmDialog {
 					System.exit(0);
 				}
             	else {
+            		if (frame instanceof IJsonSavable)
+					{
+						((IJsonSavable) frame).saveJSON();
+					}
 					((JInternalFrame) frame).dispose();
 				}
             }

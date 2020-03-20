@@ -14,7 +14,7 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class JSONSaveLoader
+public class JSONSaveLoader extends BasicSaver
 {
     public void save(String filename, GameFieldInfo gameInfo, LogFieldInfo logInfo)
     {
@@ -140,7 +140,7 @@ public class JSONSaveLoader
         for (LogEntry logEntry : logFieldInfo.logInfo)
         {
             JSONArray pair = new JSONArray();
-            pair.add(logEntry.getLevel());
+            pair.add(logEntry.getLevel().level());
             pair.add(logEntry.getMessage());
             logData.add(pair);
         }

@@ -12,8 +12,11 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import Localization.ResourceBundleLoader;
+import serialization.GameFieldInfo;
+import serialization.IJsonSavable;
+import serialization.JSONSaveLoader;
 
-public class GameWindow extends JInternalFrame
+public class GameWindow extends JInternalFrame implements IJsonSavable
 {
     private final GameVisualizer m_visualizer;
     private final static ResourceBundle resourceBundle = ResourceBundleLoader.load("GameWindow");
@@ -41,5 +44,18 @@ public class GameWindow extends JInternalFrame
     public Point2D.Double getTargerCoordinates()
     {
         return m_visualizer.getTargetCoordinates();
+    }
+
+    @Override
+    public void saveJSON()
+    {
+        JSONSaveLoader saver = new JSONSaveLoader();
+        GameFieldInfo info = saver.getGameFieldInfo(this);
+        saver.save(getSavePath(), info);
+    }
+
+    @Override
+    public String getSavePath() {
+        return "saves/game.json";
     }
 }

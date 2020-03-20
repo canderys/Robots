@@ -13,11 +13,15 @@ import Localization.ResourceBundleLoader;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
+import serialization.IJsonSavable;
+import serialization.JSONSaveLoader;
+import serialization.LogFieldInfo;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener
+public class LogWindow extends JInternalFrame implements LogChangeListener, IJsonSavable
 {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
@@ -63,5 +67,17 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
     public void onLogChanged()
     {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    @Override
+    public void saveJSON() {
+        JSONSaveLoader saver = new JSONSaveLoader();
+        LogFieldInfo info = saver.getLogFieldInfo(this);
+        saver.save(getSavePath(), info);
+    }
+
+    @Override
+    public String getSavePath() {
+        return "saves/log.json";
     }
 }
