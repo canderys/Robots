@@ -19,4 +19,14 @@ public class FieldInfo
         this.height = height;
         this.width = width;
     }
+
+    public FieldInfo(FieldInfo info)
+    {
+        isIcon = info.isIcon;
+        isMaximised = info.isMaximised;
+        xCoord = info.xCoord;
+        yCoord = info.yCoord;
+        height = info.height;
+        width = info.width;
+    }
 }

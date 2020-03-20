@@ -13,4 +13,9 @@ public class LogFieldInfo extends FieldInfo
         super(x, y, height, width, isIcon, isMaximised);
         this.logInfo = logInfo.toArray(new LogEntry[0]);
     }
+    public LogFieldInfo(FieldInfo fieldInfo, LinkedList<LogEntry> logInfo)
+    {
+        super(fieldInfo);
+        this.logInfo = logInfo.toArray(new LogEntry[0]);
+    }
 }

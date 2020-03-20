@@ -25,6 +25,8 @@ import javax.swing.event.InternalFrameEvent;
 
 import Localization.ResourceBundleLoader;
 import log.Logger;
+import serialization.JSONSaveLoader;
+import serialization.Saver;
 
 /**
  * Что требуется сделать:

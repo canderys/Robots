@@ -24,4 +24,15 @@ public class GameFieldInfo extends FieldInfo
         this.yTarget = yTarget;
     }
 
+    public GameFieldInfo(FieldInfo fieldInfo, double xRobot, double yRobot,
+                         double robotDirection, double xTarget, double yTarget)
+    {
+        super(fieldInfo);
+        this.xRobot = xRobot;
+        this.yRobot = yRobot;
+        this.robotDirection = robotDirection;
+        this.xTarget = xTarget;
+        this.yTarget = yTarget;
+    }
+
 }
