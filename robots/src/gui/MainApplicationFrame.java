@@ -34,7 +34,8 @@ import serialization.GameFieldInfo;
 import serialization.LogFieldInfo;
 import Localization.LanguageChangeable;
 
-public class MainApplicationFrame extends JFrame implements IJsonSavable, LanguageChangeable
+public class MainApplicationFrame extends JFrame implements 
+		IJsonSavable, LanguageChangeable, ActionDialog
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private ResourceBundle resourceBundle = ResourceBundleLoader.load("MainApplicationFrame");
@@ -70,37 +71,39 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable, Langua
         LoadStatus loadStatus = new LoadStatus();
         if (dataLoaded)
         {
-        	//Вот тут проблема
         	ConfirmDialog loadDialog = new ConfirmDialog();
-        	this.addWindowListener(loadDialog.showConfirmLoadDialogJFrame(resourceBundle.getString("loadMessage"), 
-            		resourceBundle.getString("loadTitle"), loadStatus));
-        }
-        
-        LogWindow logWindow;
-        if(dataLoaded && loadStatus.getLoad())
-        	logWindow = createLogWindow(logInfo.xCoord, logInfo.yCoord, logInfo.width, logInfo.height, logInfo.logInfo);
-        else
-        	logWindow = createLogWindow(10, 10, 300, 800, null);
-        
-        addWindow(logWindow);
-        saveOnClose.add(logWindow);
-        
-        GameWindow gameWindow;
-        if (dataLoaded && loadStatus.getLoad())
-        {
-        	gameWindow = new GameWindow(gameFieldInfo);
-        	gameWindow.setSize(gameFieldInfo.width, gameFieldInfo.height);
-        	gameWindow.setLocation(gameFieldInfo.xCoord, gameFieldInfo.yCoord);   
+        	this.addWindowListener(
+        			loadDialog.showConfirmOpenDialogJFrame(resourceBundle.getString("loadMessage"), 
+            		resourceBundle.getString("loadTitle"), this));
         }
         else
-        {
-        	gameWindow = new GameWindow();
-        	gameWindow.setSize(400,  400);
-        	gameWindow.setLocation(10, 10);  
-        }
+        	createMainApplication();
+    }
+    
+    private void createMainApplication()
+    {
+    	LogWindow logWindow = createLogWindow(10, 10, 300, 800, null);
+    	addWindow(logWindow);
+    	saveOnClose.add(logWindow);
+    	GameWindow gameWindow = new GameWindow();
+    	gameWindow.setSize(400,  400);
+    	gameWindow.setLocation(10, 10);
         addWindow(gameWindow);
         saveOnClose.add(gameWindow);
-
+        setJMenuBar(generateMenuBar());
+    }
+    
+    private void createMainApplicationBySaves()
+    {
+    	LogWindow logWindow = createLogWindow(logInfo.xCoord, logInfo.yCoord, 
+    						logInfo.width, logInfo.height, logInfo.logInfo);
+        addWindow(logWindow);
+        saveOnClose.add(logWindow);
+        GameWindow gameWindow = new GameWindow(gameFieldInfo);
+    	gameWindow.setSize(gameFieldInfo.width, gameFieldInfo.height);
+    	gameWindow.setLocation(gameFieldInfo.xCoord, gameFieldInfo.yCoord);
+        addWindow(gameWindow);
+        saveOnClose.add(gameWindow);
         setJMenuBar(generateMenuBar());
     }
     
@@ -330,5 +333,15 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable, Langua
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"))
         );
+	}
+
+	@Override
+	public void executeTrue() {
+		createMainApplicationBySaves();
+	}
+
+	@Override
+	public void executeFalse() {
+		createMainApplication();
 	}
 }

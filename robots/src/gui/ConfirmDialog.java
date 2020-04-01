@@ -51,32 +51,6 @@ public class ConfirmDialog {
             return false;
 	}
 	
-	public void showConfirmLoadDialog(String exitMessage, String exitTitle,
-			Object frame, FrameType frameType, LoadStatus loadStatus)
-	{
-		String[] options = new String[2];
-		options[0] = resourceBundle.getString("Agree");
-		options[1] = resourceBundle.getString("Disagree");
-		int result = JOptionPane.showOptionDialog((Component) frame, exitMessage, exitTitle,
-					JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[1]);
-		if (result == JOptionPane.YES_OPTION) 
-		{
-			loadStatus.setLoad(true);
-			if(frameType == FrameType.JFrame) 
-			{
-				//((JFrame) frame).dispose();
-				
-			}
-			else 
-			{
-				//((JInternalFrame) frame).dispose();
-			}
-		}
-		else
-		{
-			loadStatus.setLoad(false);
-		}
-	}
 	
 	public InternalFrameAdapter showConfirmDialogJInternalFrame(String exitMessage, 
 			String exitTitle, CloseInternalFrame close)
@@ -99,12 +73,28 @@ public class ConfirmDialog {
 	        };
 	}
 	
-	public WindowAdapter showConfirmLoadDialogJFrame(String exitMessage, String exitTitle, LoadStatus loadStatus)
+	public void showConfirmOpenDialog(String exitMessage, String exitTitle,
+			Object frame, FrameType frameType, ActionDialog action)
+	{
+		String[] options = new String[2];
+		options[0] = resourceBundle.getString("Agree");
+		options[1] = resourceBundle.getString("Disagree");
+		int result = JOptionPane.showOptionDialog((Component) frame, exitMessage, exitTitle,
+					JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[1]);
+		if (result == JOptionPane.YES_OPTION) 
+			action.executeTrue();
+		else
+			action.executeFalse();
+	}
+	
+	public WindowAdapter showConfirmOpenDialogJFrame(String exitMessage, 
+			String exitTitle, ActionDialog action)
 	{
 		 return new WindowAdapter(){
 	            public void windowOpened(WindowEvent e)
 	            {
-	            	showConfirmLoadDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame, loadStatus);
+	            	showConfirmOpenDialog(exitMessage, exitTitle, 
+	            			e.getSource(), FrameType.JFrame, action);
 	            }
 	        };
 	}
