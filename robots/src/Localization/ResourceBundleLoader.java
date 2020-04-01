@@ -12,7 +12,7 @@ import java.io.File;
 public class ResourceBundleLoader {
 	public static ResourceBundle load(String bundleName)
 	{
-		String dir = "localization";
+		String dir = "robots/localization";
         File file = new File(dir);
         try {
         	URL[] urls = {file.toURI().toURL()};

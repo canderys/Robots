@@ -20,9 +20,7 @@ import javax.swing.WindowConstants;
 
 import Localization.ResourceBundleLoader;
 import log.Logger;
-import serialization.FieldInfo;
-import serialization.IJsonSavable;
-import serialization.JSONSaveLoader;
+import serialization.*;
 
 /**
  * Что требуется сделать:
