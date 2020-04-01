@@ -60,7 +60,7 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable, Langua
             screenSize.height - inset*2);
         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         ConfirmDialog dialog = new ConfirmDialog();
-        this.addWindowListener(dialog.ShowConfirmDialogJFrame(
+        this.addWindowListener(dialog.showConfirmDialogJFrame(
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"))
         );
@@ -72,7 +72,7 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable, Langua
         {
         	//Вот тут проблема
         	ConfirmDialog loadDialog = new ConfirmDialog();
-        	this.addWindowListener(loadDialog.ShowConfirmLoadDialogJFrame(resourceBundle.getString("loadMessage"), 
+        	this.addWindowListener(loadDialog.showConfirmLoadDialogJFrame(resourceBundle.getString("loadMessage"), 
             		resourceBundle.getString("loadTitle"), loadStatus));
         }
         
@@ -228,7 +228,7 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable, Langua
     	JMenuItem exitMenu = new JMenuItem(resourceBundle.getString("exitMenuTitle"));
     	exitMenu.setMnemonic(KeyEvent.VK_S);
     	ConfirmDialog dialog = new ConfirmDialog();
-    	exitMenu.addActionListener((event)-> {dialog.ShowConfirmDialog(
+    	exitMenu.addActionListener((event)-> {dialog.showConfirmDialog(
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"),
     			this, 
@@ -326,7 +326,7 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable, Langua
         
         this.removeWindowListener(this.getWindowListeners()[0]);
         ConfirmDialog dialog = new ConfirmDialog();
-        this.addWindowListener(dialog.ShowConfirmDialogJFrame(
+        this.addWindowListener(dialog.showConfirmDialogJFrame(
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"))
         );

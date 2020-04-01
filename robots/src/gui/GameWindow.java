@@ -83,9 +83,10 @@ public class GameWindow extends JInternalFrame implements IJsonSavable, Language
         getContentPane().add(panel);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ConfirmDialog dialog = new ConfirmDialog();
-        this.addInternalFrameListener(dialog.ShowConfirmDialogJInternalFrame(
+        this.addInternalFrameListener(dialog.showConfirmDialogJInternalFrame(
                 resourceBundle.getString("exitMessage"),
-                resourceBundle.getString("exitAppTitle"))
+                resourceBundle.getString("exitAppTitle"),
+                null)
         );
         pack();
     }
@@ -95,9 +96,10 @@ public class GameWindow extends JInternalFrame implements IJsonSavable, Language
 		resourceBundle = ResourceBundleLoader.load("GameWindow");
 		this.removeInternalFrameListener(this.getInternalFrameListeners()[0]);
 		ConfirmDialog dialog = new ConfirmDialog();
-		this.addInternalFrameListener(dialog.ShowConfirmDialogJInternalFrame(
+		this.addInternalFrameListener(dialog.showConfirmDialogJInternalFrame(
                 resourceBundle.getString("exitMessage"),
-                resourceBundle.getString("exitAppTitle"))
+                resourceBundle.getString("exitAppTitle"),
+                null)
         );
 		this.setTitle(resourceBundle.getString("title"));
 	}

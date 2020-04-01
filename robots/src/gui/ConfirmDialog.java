@@ -21,7 +21,7 @@ public class ConfirmDialog {
 	
 	private final static ResourceBundle resourceBundle = ResourceBundleLoader.load("ConfirmDialog");
 	
-	public void ShowConfirmDialog(String exitMessage, String exitTitle,
+	public boolean showConfirmDialog(String exitMessage, String exitTitle,
 								Object frame, FrameType frameType)
 	{
 		String[] options = new String[2];
@@ -46,10 +46,12 @@ public class ConfirmDialog {
 						((IJsonSavable) frame).saveJSON();
 					((JInternalFrame) frame).dispose();
 				}
+            	return true;
             }
+            return false;
 	}
 	
-	public void ShowConfirmLoadDialog(String exitMessage, String exitTitle,
+	public void showConfirmLoadDialog(String exitMessage, String exitTitle,
 			Object frame, FrameType frameType, LoadStatus loadStatus)
 	{
 		String[] options = new String[2];
@@ -76,30 +78,33 @@ public class ConfirmDialog {
 		}
 	}
 	
-	public InternalFrameAdapter ShowConfirmDialogJInternalFrame(String exitMessage, String exitTitle)
+	public InternalFrameAdapter showConfirmDialogJInternalFrame(String exitMessage, 
+			String exitTitle, CloseInternalFrame close)
 	{
 		return new InternalFrameAdapter(){
         	public void internalFrameClosing(InternalFrameEvent e) {
-        		ShowConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JInternalFrame);
+        		if(showConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JInternalFrame) &&
+        				close != null)
+        			close.close(e);
         	}
         };
 	}
 	
-	public WindowAdapter ShowConfirmDialogJFrame(String exitMessage, String exitTitle)
+	public WindowAdapter showConfirmDialogJFrame(String exitMessage, String exitTitle)
 	{
 		 return new WindowAdapter(){
 	            public void windowClosing(WindowEvent e){
-	            	ShowConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame);
+	            	showConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame);
 	            }
 	        };
 	}
 	
-	public WindowAdapter ShowConfirmLoadDialogJFrame(String exitMessage, String exitTitle, LoadStatus loadStatus)
+	public WindowAdapter showConfirmLoadDialogJFrame(String exitMessage, String exitTitle, LoadStatus loadStatus)
 	{
 		 return new WindowAdapter(){
 	            public void windowOpened(WindowEvent e)
 	            {
-	            	ShowConfirmLoadDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame, loadStatus);
+	            	showConfirmLoadDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame, loadStatus);
 	            }
 	        };
 	}

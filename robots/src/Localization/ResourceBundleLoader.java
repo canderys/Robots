@@ -5,6 +5,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.io.File;
@@ -25,7 +27,7 @@ public class ResourceBundleLoader {
 	
 	public static ResourceBundle load(String bundleName)
 	{
-		String dir = "robots/localization";
+		String dir = System.getProperty("user.dir") + File.separator + "localization";
         File file = new File(dir);
         try {
         	URL[] urls = {file.toURI().toURL()};

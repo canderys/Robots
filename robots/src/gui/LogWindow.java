@@ -22,7 +22,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener, IJsonSavable, LanguageChangeable
+public class LogWindow extends JInternalFrame implements LogChangeListener, 
+	IJsonSavable, LanguageChangeable, CloseInternalFrame
 {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
@@ -56,9 +57,10 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, IJso
         updateLogContent();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ConfirmDialog dialog = new ConfirmDialog();
-        this.addInternalFrameListener(dialog.ShowConfirmDialogJInternalFrame(
+        this.addInternalFrameListener(dialog.showConfirmDialogJInternalFrame(
         		resourceBundle.getString("exitMessage"), 
-        		resourceBundle.getString("exitAppTitle"))
+        		resourceBundle.getString("exitAppTitle"),
+        		this)
         );
     }
     
@@ -114,10 +116,17 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, IJso
 		this.setTitle(resourceBundle.getString("title"));
 		this.removeInternalFrameListener(this.getInternalFrameListeners()[0]);
 		ConfirmDialog dialog = new ConfirmDialog();
-		this.addInternalFrameListener(dialog.ShowConfirmDialogJInternalFrame(
+		this.addInternalFrameListener(dialog.showConfirmDialogJInternalFrame(
         		resourceBundle.getString("exitMessage"), 
-        		resourceBundle.getString("exitAppTitle"))
+        		resourceBundle.getString("exitAppTitle"),
+        		this)
         );
 		updateLogContent();
+	}
+
+	@Override
+	public void close(InternalFrameEvent e) {
+		 m_logSource.unregisterListener((LogChangeListener) e.getInternalFrame());
+		
 	}
 }
