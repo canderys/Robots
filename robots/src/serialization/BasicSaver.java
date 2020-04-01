@@ -22,6 +22,13 @@ public class BasicSaver
 
         LinkedList<LogEntry> logInfo = new LinkedList<LogEntry>();
         Iterable<LogEntry> iter = window.getLogInfo();
+        LogEntry[] startContent = window.getStartContent();
+        if (startContent != null)
+	        for (LogEntry current : startContent)
+	        {
+	            logInfo.add(current);
+	        }
+	        
         for (LogEntry current : iter)
         {
             logInfo.add(current);

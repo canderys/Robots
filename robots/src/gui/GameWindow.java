@@ -22,20 +22,25 @@ import serialization.GameFieldInfo;
 import serialization.IJsonSavable;
 import serialization.JSONSaveLoader;
 
-public class GameWindow extends JInternalFrame implements IJsonSavable
+import Localization.LanguageChangeable;
+
+public class GameWindow extends JInternalFrame implements IJsonSavable, LanguageChangeable
 {
     private final GameVisualizer m_visualizer;
-    private final static ResourceBundle resourceBundle = ResourceBundleLoader.load("GameWindow");
+    private static ResourceBundle resourceBundle = ResourceBundleLoader.load("GameWindow");
 
     public GameWindow() 
     {
         super(resourceBundle.getString("title"), true, true, true, true);
+    	ResourceBundleLoader.addElementToUpdate(this);
         m_visualizer = new GameVisualizer();
         setUp();
     }
 
-    public GameWindow(GameFieldInfo info){
+    public GameWindow(GameFieldInfo info)
+    {
         super(resourceBundle.getString("title"), true, true, true, true);
+        ResourceBundleLoader.addElementToUpdate(this);
         this.setBounds(info.xCoord, info.yCoord, info.width, info.height);
         try
         {
@@ -84,4 +89,16 @@ public class GameWindow extends JInternalFrame implements IJsonSavable
         );
         pack();
     }
+
+	@Override
+	public void changeLanguage() {
+		resourceBundle = ResourceBundleLoader.load("GameWindow");
+		this.removeInternalFrameListener(this.getInternalFrameListeners()[0]);
+		ConfirmDialog dialog = new ConfirmDialog();
+		this.addInternalFrameListener(dialog.ShowConfirmDialogJInternalFrame(
+                resourceBundle.getString("exitMessage"),
+                resourceBundle.getString("exitAppTitle"))
+        );
+		this.setTitle(resourceBundle.getString("title"));
+	}
 }

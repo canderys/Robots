@@ -3,8 +3,13 @@ package gui;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.swing.JDesktopPane;
@@ -19,27 +24,36 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import Localization.ResourceBundleLoader;
+import log.LogEntry;
 import log.Logger;
-import serialization.*;
+import serialization.FieldInfo;
+import serialization.IJsonSavable;
+import serialization.JSONSaveLoader;
+import serialization.LoadStatus;
+import serialization.GameFieldInfo;
+import serialization.LogFieldInfo;
+import Localization.LanguageChangeable;
 
-/**
- * Что требуется сделать:
- * 1. Метод создания меню перегружен функционалом и трудно читается. 
- * Следует разделить его на серию более простых методов (или вообще выделить отдельный класс).
- *
- */
-public class MainApplicationFrame extends JFrame implements IJsonSavable
+public class MainApplicationFrame extends JFrame implements IJsonSavable, LanguageChangeable
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private final static ResourceBundle resourceBundle = ResourceBundleLoader.
-    													load("MainApplicationFrame");
+    private ResourceBundle resourceBundle = ResourceBundleLoader.load("MainApplicationFrame");
 
     private final List<IJsonSavable> saveOnClose = new ArrayList<>();
+    
+    private boolean dataLoaded = false;
+    private FieldInfo fieldInfo;
+    private GameFieldInfo gameFieldInfo;
+    private LogFieldInfo logInfo;
     
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
-        int inset = 50;        
+    	dataLoaded = loadJSON();
+    	
+    	ResourceBundleLoader.addElementToUpdate(this);
+        int inset = 50;
+        	
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
             screenSize.width  - inset*2,
@@ -53,28 +67,57 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable
 
         setContentPane(desktopPane);
         
+        LoadStatus loadStatus = new LoadStatus();
+        if (dataLoaded)
+        {
+        	//Вот тут проблема
+        	ConfirmDialog loadDialog = new ConfirmDialog();
+        	this.addWindowListener(loadDialog.ShowConfirmLoadDialogJFrame(resourceBundle.getString("loadMessage"), 
+            		resourceBundle.getString("loadTitle"), loadStatus));
+        }
         
-        LogWindow logWindow = createLogWindow();
+        LogWindow logWindow;
+        if(dataLoaded && loadStatus.getLoad())
+        	logWindow = createLogWindow(logInfo.xCoord, logInfo.yCoord, logInfo.width, logInfo.height, logInfo.logInfo);
+        else
+        	logWindow = createLogWindow(10, 10, 300, 800, null);
+        
         addWindow(logWindow);
         saveOnClose.add(logWindow);
         
-
-        GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400,  400);
+        GameWindow gameWindow;
+        if (dataLoaded && loadStatus.getLoad())
+        {
+        	gameWindow = new GameWindow(gameFieldInfo);
+        	gameWindow.setSize(gameFieldInfo.width, gameFieldInfo.height);
+        	gameWindow.setLocation(gameFieldInfo.xCoord, gameFieldInfo.yCoord);   
+        }
+        else
+        {
+        	gameWindow = new GameWindow();
+        	gameWindow.setSize(400,  400);
+        	gameWindow.setLocation(10, 10);  
+        }
         addWindow(gameWindow);
         saveOnClose.add(gameWindow);
 
         setJMenuBar(generateMenuBar());
     }
     
-    protected LogWindow createLogWindow()
+    protected LogWindow createLogWindow(int posX, int posY, int sizeX, int sizeY, LogEntry[] content)
     {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-        logWindow.setLocation(10,10);
-        logWindow.setSize(300, 800);
+    	LogWindow logWindow;
+    	if (content != null)
+    		logWindow = new LogWindow(Logger.getDefaultLogSource(), content);
+    	else
+    	{
+    		logWindow = new LogWindow(Logger.getDefaultLogSource());
+    		Logger.debug("LogWindowMessage");
+    	}
+        logWindow.setLocation(posX, posY);
+        logWindow.setSize(sizeX, sizeY);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
-        Logger.debug(resourceBundle.getString("LogWindowMessage"));
         return logWindow;
     }
     
@@ -114,14 +157,16 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable
 //    }
     
     private JMenuBar generateMenuBar()
-    {
+    {	
         JMenuBar menuBar = new JMenuBar();
         JMenu lookAndFeelMenu = createLookAndFeel();
         JMenu testMenu = createTestMenu();
         JMenuItem exitMenu = createExitMenu();
+        JMenuItem languageMenu = createLanguageMenu();
 
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
+        menuBar.add(languageMenu);
         menuBar.add(exitMenu);
         return menuBar;
     }
@@ -163,7 +208,7 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable
         {
             JMenuItem addLogMessageItem = new JMenuItem(resourceBundle.getString("testMessageLog"), KeyEvent.VK_S);
             addLogMessageItem.addActionListener((event) -> {
-                Logger.debug(resourceBundle.getString("testDebugMessageLog"));
+                Logger.debug("testDebugMessageLog");
             });
             testMenu.add(addLogMessageItem);
         }
@@ -171,7 +216,7 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable
         {
             JMenuItem addLogMessageItem = new JMenuItem(resourceBundle.getString("testAnotherLog"), KeyEvent.VK_S);
             addLogMessageItem.addActionListener((event) -> {
-                Logger.debug(resourceBundle.getString("testDebugAnotherLog"));
+                Logger.debug("testDebugAnotherLog");
             });
             testMenu.add(addLogMessageItem);
         }
@@ -189,6 +234,31 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable
     			this, 
     			FrameType.JFrame);});
     	return exitMenu;
+    }
+    
+    private JMenuItem createLanguageMenu()
+    {
+    	JMenu languageMenu = new JMenu(resourceBundle.getString("languageMenuTitle"));
+    	languageMenu.setMnemonic(KeyEvent.VK_L);
+        languageMenu.getAccessibleContext().setAccessibleDescription(resourceBundle.getString("testCommands"));
+        {
+            JMenuItem addLogMessageItem = new JMenuItem(resourceBundle.getString("languageRu"), KeyEvent.VK_S);
+            addLogMessageItem.addActionListener((event) -> {
+                Logger.debug("languageChangedRu");
+                ResourceBundleLoader.updateLanguage(Locale.getDefault());
+            });
+            languageMenu.add(addLogMessageItem);
+        }
+
+        {
+            JMenuItem addLogMessageItem = new JMenuItem(resourceBundle.getString("languageEn"), KeyEvent.VK_S);
+            addLogMessageItem.addActionListener((event) -> {
+                Logger.debug("languageChangedEn");
+                ResourceBundleLoader.updateLanguage(Locale.US);
+            });
+            languageMenu.add(addLogMessageItem);
+        }
+        return languageMenu;
     }
 
     private void setLookAndFeel(String className)
@@ -209,15 +279,56 @@ public class MainApplicationFrame extends JFrame implements IJsonSavable
     public void saveJSON() {
         JSONSaveLoader saver = new JSONSaveLoader();
         FieldInfo info = saver.getMainFrameInfo(this);
+        checkSaveFolder("saves");
         saver.saveMainFrame(getSavePath(), info);
         for (IJsonSavable item : saveOnClose)
         {
             item.saveJSON();
         }
     }
+    
+    private void checkSaveFolder(String name)
+    {
+    	if (!checkFileExist(name)) {
+    		 File file = new File(name);
+    	     file.mkdir();
+    	}
+    }
 
     @Override
     public String getSavePath() {
         return "saves/MainFrame.json";
     }
+    
+    private boolean loadJSON()
+    {
+    	if (!checkFileExist("saves/MainFrame.json") || !checkFileExist("saves/game.json") || !checkFileExist("saves/log.json"))
+    		return false;
+    	
+    	JSONSaveLoader loader = new JSONSaveLoader();
+    	logInfo = loader.loadLogInfo("saves/log.json");
+    	gameFieldInfo = loader.loadGameInfo("saves/game.json");
+    	fieldInfo = loader.loadMainFrameInfo("saves/MainFrame.json");
+    	return true;
+    }
+    
+    private boolean checkFileExist(String name)
+    {
+    	Path path = Paths.get(name);
+    	return Files.exists(path);
+    }
+
+	@Override
+	public void changeLanguage() {
+		resourceBundle = ResourceBundleLoader.load("MainApplicationFrame");
+		this.getJMenuBar().removeAll();
+        setJMenuBar(generateMenuBar());
+        
+        this.removeWindowListener(this.getWindowListeners()[0]);
+        ConfirmDialog dialog = new ConfirmDialog();
+        this.addWindowListener(dialog.ShowConfirmDialogJFrame(
+        		resourceBundle.getString("exitMessage"), 
+        		resourceBundle.getString("exitAppTitle"))
+        );
+	}
 }
