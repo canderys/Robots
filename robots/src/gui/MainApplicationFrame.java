@@ -3,6 +3,7 @@ package gui;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -102,6 +103,12 @@ public class MainApplicationFrame extends JFrame implements
         GameWindow gameWindow = new GameWindow(gameFieldInfo);
     	gameWindow.setSize(gameFieldInfo.width, gameFieldInfo.height);
     	gameWindow.setLocation(gameFieldInfo.xCoord, gameFieldInfo.yCoord);
+    	try {
+			gameWindow.setIcon(gameFieldInfo.isIcon);
+			logWindow.setIcon(logInfo.isIcon);
+		} catch (PropertyVetoException e) {
+			e.printStackTrace();
+		}
         addWindow(gameWindow);
         saveOnClose.add(gameWindow);
         setJMenuBar(generateMenuBar());
