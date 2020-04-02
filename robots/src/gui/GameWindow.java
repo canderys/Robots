@@ -83,7 +83,7 @@ public class GameWindow extends JInternalFrame implements IJsonSavable, Language
         getContentPane().add(panel);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ConfirmDialog dialog = new ConfirmDialog();
-        this.addInternalFrameListener(dialog.showConfirmDialogJInternalFrame(
+        this.addInternalFrameListener(dialog.showExitConfirmDialogJInternalFrame(
                 resourceBundle.getString("exitMessage"),
                 resourceBundle.getString("exitAppTitle"),
                 null)
@@ -96,7 +96,7 @@ public class GameWindow extends JInternalFrame implements IJsonSavable, Language
 		resourceBundle = ResourceBundleLoader.load("GameWindow");
 		this.removeInternalFrameListener(this.getInternalFrameListeners()[0]);
 		ConfirmDialog dialog = new ConfirmDialog();
-		this.addInternalFrameListener(dialog.showConfirmDialogJInternalFrame(
+		this.addInternalFrameListener(dialog.showExitConfirmDialogJInternalFrame(
                 resourceBundle.getString("exitMessage"),
                 resourceBundle.getString("exitAppTitle"),
                 null)

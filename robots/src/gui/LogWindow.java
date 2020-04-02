@@ -57,7 +57,7 @@ public class LogWindow extends JInternalFrame implements LogChangeListener,
         updateLogContent();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ConfirmDialog dialog = new ConfirmDialog();
-        this.addInternalFrameListener(dialog.showConfirmDialogJInternalFrame(
+        this.addInternalFrameListener(dialog.showExitConfirmDialogJInternalFrame(
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"),
         		this)
@@ -116,7 +116,7 @@ public class LogWindow extends JInternalFrame implements LogChangeListener,
 		this.setTitle(resourceBundle.getString("title"));
 		this.removeInternalFrameListener(this.getInternalFrameListeners()[0]);
 		ConfirmDialog dialog = new ConfirmDialog();
-		this.addInternalFrameListener(dialog.showConfirmDialogJInternalFrame(
+		this.addInternalFrameListener(dialog.showExitConfirmDialogJInternalFrame(
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"),
         		this)

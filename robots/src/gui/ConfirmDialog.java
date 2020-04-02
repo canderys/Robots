@@ -21,7 +21,7 @@ public class ConfirmDialog {
 	
 	private final static ResourceBundle resourceBundle = ResourceBundleLoader.load("ConfirmDialog");
 	
-	public boolean showConfirmDialog(String exitMessage, String exitTitle,
+	public boolean createExitConfirmDialog(String exitMessage, String exitTitle,
 								Object frame, FrameType frameType)
 	{
 		String[] options = new String[2];
@@ -52,28 +52,28 @@ public class ConfirmDialog {
 	}
 	
 	
-	public InternalFrameAdapter showConfirmDialogJInternalFrame(String exitMessage, 
+	public InternalFrameAdapter showExitConfirmDialogJInternalFrame(String exitMessage, 
 			String exitTitle, CloseInternalFrame close)
 	{
 		return new InternalFrameAdapter(){
         	public void internalFrameClosing(InternalFrameEvent e) {
-        		if(showConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JInternalFrame) &&
+        		if(createExitConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JInternalFrame) &&
         				close != null)
         			close.close(e);
         	}
         };
 	}
 	
-	public WindowAdapter showConfirmDialogJFrame(String exitMessage, String exitTitle)
+	public WindowAdapter showExitConfirmDialogJFrame(String exitMessage, String exitTitle)
 	{
 		 return new WindowAdapter(){
 	            public void windowClosing(WindowEvent e){
-	            	showConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame);
+	            	createExitConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame);
 	            }
 	        };
 	}
 	
-	public void showConfirmOpenDialog(String exitMessage, String exitTitle,
+	private void createConfirmDialogWithAction(String exitMessage, String exitTitle,
 			Object frame, FrameType frameType, ActionDialog action)
 	{
 		String[] options = new String[2];
@@ -87,13 +87,13 @@ public class ConfirmDialog {
 			action.executeFalse();
 	}
 	
-	public WindowAdapter showConfirmOpenDialogJFrame(String exitMessage, 
+	public WindowAdapter showOpenConfirmDialogJFrame(String exitMessage, 
 			String exitTitle, ActionDialog action)
 	{
 		 return new WindowAdapter(){
 	            public void windowOpened(WindowEvent e)
 	            {
-	            	showConfirmOpenDialog(exitMessage, exitTitle, 
+	            	createConfirmDialogWithAction(exitMessage, exitTitle, 
 	            			e.getSource(), FrameType.JFrame, action);
 	            }
 	        };

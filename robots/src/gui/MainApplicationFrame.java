@@ -61,7 +61,7 @@ public class MainApplicationFrame extends JFrame implements
             screenSize.height - inset*2);
         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         ConfirmDialog dialog = new ConfirmDialog();
-        this.addWindowListener(dialog.showConfirmDialogJFrame(
+        this.addWindowListener(dialog.showExitConfirmDialogJFrame(
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"))
         );
@@ -73,7 +73,7 @@ public class MainApplicationFrame extends JFrame implements
         {
         	ConfirmDialog loadDialog = new ConfirmDialog();
         	this.addWindowListener(
-        			loadDialog.showConfirmOpenDialogJFrame(resourceBundle.getString("loadMessage"), 
+        			loadDialog.showOpenConfirmDialogJFrame(resourceBundle.getString("loadMessage"), 
             		resourceBundle.getString("loadTitle"), this));
         }
         else
@@ -129,35 +129,6 @@ public class MainApplicationFrame extends JFrame implements
         desktopPane.add(frame);
         frame.setVisible(true);
     }
-    
-//    protected JMenuBar createMenuBar() {
-//        JMenuBar menuBar = new JMenuBar();
-// 	
-//        //Set up the lone menu.
-//        JMenu menu = new JMenu("Document");
-//        menu.setMnemonic(KeyEvent.VK_D);
-//        menuBar.add(menu);
-// 
-//        //Set up the first menu item.
-//        JMenuItem menuItem = new JMenuItem("New");
-//        menuItem.setMnemonic(KeyEvent.VK_N);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_N, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("new");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-// 
-//        //Set up the second menu item.
-//        menuItem = new JMenuItem("Quit");
-//        menuItem.setMnemonic(KeyEvent.VK_Q);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("quit");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-// 
-//        return menuBar;
-//    }
     
     private JMenuBar generateMenuBar()
     {	
@@ -231,7 +202,7 @@ public class MainApplicationFrame extends JFrame implements
     	JMenuItem exitMenu = new JMenuItem(resourceBundle.getString("exitMenuTitle"));
     	exitMenu.setMnemonic(KeyEvent.VK_S);
     	ConfirmDialog dialog = new ConfirmDialog();
-    	exitMenu.addActionListener((event)-> {dialog.showConfirmDialog(
+    	exitMenu.addActionListener((event)-> {dialog.createExitConfirmDialog(
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"),
     			this, 
@@ -329,7 +300,7 @@ public class MainApplicationFrame extends JFrame implements
         
         this.removeWindowListener(this.getWindowListeners()[0]);
         ConfirmDialog dialog = new ConfirmDialog();
-        this.addWindowListener(dialog.showConfirmDialogJFrame(
+        this.addWindowListener(dialog.showExitConfirmDialogJFrame(
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"))
         );
