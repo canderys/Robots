@@ -12,9 +12,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-
 import Localization.ResourceBundleLoader;
-import serialization.IJsonSavable;
 import serialization.LoadStatus;
 
 public class ConfirmDialog {
@@ -22,7 +20,7 @@ public class ConfirmDialog {
 	private final static ResourceBundle resourceBundle = ResourceBundleLoader.load("ConfirmDialog");
 	
 	public boolean createExitConfirmDialog(String exitMessage, String exitTitle,
-								Object frame, FrameType frameType)
+								Object frame, FrameType frameType, ExitAction exitAction)
 	{
 		String[] options = new String[2];
 		options[0] = resourceBundle.getString("Agree");
@@ -33,17 +31,15 @@ public class ConfirmDialog {
         
             if (result == JOptionPane.YES_OPTION) 
             {
+            	if(exitAction != null)
+            		exitAction.doExitAction();
             	if(frameType == FrameType.JFrame) 
             	{
-            		if(frame instanceof IJsonSavable)
-            			((IJsonSavable) frame).saveJSON();
 					((JFrame) frame).dispose();
 					System.exit(0);
 				}
             	else 
             	{
-            		if (frame instanceof IJsonSavable)
-						((IJsonSavable) frame).saveJSON();
 					((JInternalFrame) frame).dispose();
 				}
             	return true;
@@ -52,23 +48,27 @@ public class ConfirmDialog {
 	}
 	
 	
+	
+	
+	
 	public InternalFrameAdapter showExitConfirmDialogJInternalFrame(String exitMessage, 
 			String exitTitle, CloseInternalFrame close)
 	{
 		return new InternalFrameAdapter(){
         	public void internalFrameClosing(InternalFrameEvent e) {
-        		if(createExitConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JInternalFrame) &&
+        		if(createExitConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JInternalFrame, null) &&
         				close != null)
         			close.close(e);
         	}
         };
 	}
 	
-	public WindowAdapter showExitConfirmDialogJFrame(String exitMessage, String exitTitle)
+	public WindowAdapter showExitConfirmDialogJFrame(String exitMessage, String exitTitle, 
+			ExitAction exitAction)
 	{
 		 return new WindowAdapter(){
 	            public void windowClosing(WindowEvent e){
-	            	createExitConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame);
+	            	createExitConfirmDialog(exitMessage, exitTitle, e.getSource(), FrameType.JFrame, exitAction);
 	            }
 	        };
 	}

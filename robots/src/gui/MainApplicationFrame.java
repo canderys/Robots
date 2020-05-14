@@ -5,10 +5,13 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyVetoException;
 import java.io.File;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -24,94 +27,117 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 import Localization.ResourceBundleLoader;
+import log.LogLevel;
 import log.LogEntry;
 import log.Logger;
-import serialization.FieldInfo;
-import serialization.IJsonSavable;
-import serialization.JSONSaveLoader;
+import serialization.ISavableWindow;
+import serialization.JsonWindowsSaver;
 import serialization.LoadStatus;
-import serialization.GameFieldInfo;
-import serialization.LogFieldInfo;
+import serialization.WindowDescriptor;
+import serialization.WindowsSaver;
 import Localization.LanguageChangeable;
 
 public class MainApplicationFrame extends JFrame implements 
-		IJsonSavable, LanguageChangeable, ActionDialog
+		LanguageChangeable, ActionDialog, ISavableWindow, ExitAction
 {
+	
     private final JDesktopPane desktopPane = new JDesktopPane();
     private ResourceBundle resourceBundle = ResourceBundleLoader.load("MainApplicationFrame");
-
-    private final List<IJsonSavable> saveOnClose = new ArrayList<>();
-    
-    private boolean dataLoaded = false;
-    private FieldInfo fieldInfo;
-    private GameFieldInfo gameFieldInfo;
-    private LogFieldInfo logInfo;
+    private WindowsSaver windowsSaver = new JsonWindowsSaver();
     
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
-    	dataLoaded = loadJSON();
-    	
     	ResourceBundleLoader.addElementToUpdate(this);
-        int inset = 50;
-        	
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds(inset, inset,
-            screenSize.width  - inset*2,
-            screenSize.height - inset*2);
         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         ConfirmDialog dialog = new ConfirmDialog();
         this.addWindowListener(dialog.showExitConfirmDialogJFrame(
         		resourceBundle.getString("exitMessage"), 
-        		resourceBundle.getString("exitAppTitle"))
+        		resourceBundle.getString("exitAppTitle"), this)
         );
-
         setContentPane(desktopPane);
-        
-        LoadStatus loadStatus = new LoadStatus();
-        if (dataLoaded)
+        if (windowsSaver.isSavesExits())
         {
         	ConfirmDialog loadDialog = new ConfirmDialog();
         	this.addWindowListener(
         			loadDialog.showOpenConfirmDialogJFrame(resourceBundle.getString("loadMessage"), 
             		resourceBundle.getString("loadTitle"), this));
         }
-        else
+        else {
         	createMainApplication();
+        }
     }
     
     private void createMainApplication()
     {
+        int inset = 50;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setBounds(inset, inset,
+            screenSize.width  - inset*2,
+            screenSize.height - inset*2);
+        
     	LogWindow logWindow = createLogWindow(10, 10, 300, 800, null);
     	addWindow(logWindow);
-    	saveOnClose.add(logWindow);
     	GameWindow gameWindow = new GameWindow();
     	gameWindow.setSize(400,  400);
     	gameWindow.setLocation(10, 10);
         addWindow(gameWindow);
-        saveOnClose.add(gameWindow);
         setJMenuBar(generateMenuBar());
+        windowsSaver.registerWindow(logWindow, "log");
+        windowsSaver.registerWindow(gameWindow, "game");
+        windowsSaver.registerWindow(this, "main");
     }
     
     private void createMainApplicationBySaves()
     {
-    	LogWindow logWindow = createLogWindow(logInfo.xCoord, logInfo.yCoord, 
-    						logInfo.width, logInfo.height, logInfo.logInfo);
-        addWindow(logWindow);
-        saveOnClose.add(logWindow);
-        GameWindow gameWindow = new GameWindow(gameFieldInfo);
-    	gameWindow.setSize(gameFieldInfo.width, gameFieldInfo.height);
-    	gameWindow.setLocation(gameFieldInfo.xCoord, gameFieldInfo.yCoord);
+    	WindowDescriptor loadedMainFrame = windowsSaver.load(windowsSaver.getFileNameWindowById("main"));
+    	this.setBounds(loadedMainFrame.x, loadedMainFrame.y, 
+    			loadedMainFrame.width, loadedMainFrame.height);
+    	
+    	WindowDescriptor loadedLogWin = windowsSaver.load(windowsSaver.getFileNameWindowById("log"));
+    	HashMap<String, Object> logInfo = loadedLogWin.windowInfo;
+    	ArrayList<LinkedTreeMap> logs = (ArrayList<LinkedTreeMap>)(logInfo.get("logEntry"));
+    	LogEntry[] logEntryArray = new LogEntry[logs.size()];
+    	int i = 0;
+    	for(LinkedTreeMap log : logs)
+    	{
+    		String logLevel = (String) log.get("m_logLevel");
+    		String strMessage = (String)log.get("m_strMessage");
+    		LogLevel level = LogLevel.valueOf(logLevel);
+    		logEntryArray[i] = new LogEntry(level, strMessage);
+    		i++;
+    	}
+    	LogWindow logWindow = createLogWindow(loadedLogWin.x,loadedLogWin.y, 
+    			loadedLogWin.width, loadedLogWin.height, logEntryArray);
+    	logWindow.setBounds(loadedLogWin.x,loadedLogWin.y, 
+    			loadedLogWin.width, loadedLogWin.height);
     	try {
-			gameWindow.setIcon(gameFieldInfo.isIcon);
-			logWindow.setIcon(logInfo.isIcon);
+			logWindow.setIcon(loadedLogWin.isIcon);
+			logWindow.setMaximum(loadedLogWin.isMaximum);
+		} catch (PropertyVetoException e) {
+			e.printStackTrace();
+		}
+        addWindow(logWindow);
+        
+        WindowDescriptor loadedGameWin = windowsSaver.load(windowsSaver.getFileNameWindowById("game"));
+        GameWindow gameWindow = new GameWindow(loadedGameWin);
+        gameWindow.setBounds(loadedGameWin.x, loadedGameWin.y, loadedGameWin.width, loadedGameWin.height);
+    	try {
+    		gameWindow.setIcon(loadedGameWin.isIcon);
+    		gameWindow.setMaximum(loadedGameWin.isMaximum);
 		} catch (PropertyVetoException e) {
 			e.printStackTrace();
 		}
         addWindow(gameWindow);
-        saveOnClose.add(gameWindow);
         setJMenuBar(generateMenuBar());
+        
+        windowsSaver.registerWindow(logWindow, "log");
+        windowsSaver.registerWindow(gameWindow, "game");
+        windowsSaver.registerWindow(this, "main");
+        
     }
     
     protected LogWindow createLogWindow(int posX, int posY, int sizeX, int sizeY, LogEntry[] content)
@@ -213,7 +239,8 @@ public class MainApplicationFrame extends JFrame implements
         		resourceBundle.getString("exitMessage"), 
         		resourceBundle.getString("exitAppTitle"),
     			this, 
-    			FrameType.JFrame);});
+    			FrameType.JFrame, 
+    			this);});
     	return exitMenu;
     }
     
@@ -255,18 +282,6 @@ public class MainApplicationFrame extends JFrame implements
             // just ignore
         }
     }
-
-    @Override
-    public void saveJSON() {
-        JSONSaveLoader saver = new JSONSaveLoader();
-        FieldInfo info = saver.getMainFrameInfo(this);
-        checkSaveFolder("saves");
-        saver.saveMainFrame(getSavePath(), info);
-        for (IJsonSavable item : saveOnClose)
-        {
-            item.saveJSON();
-        }
-    }
     
     private void checkSaveFolder(String name)
     {
@@ -276,22 +291,6 @@ public class MainApplicationFrame extends JFrame implements
     	}
     }
 
-    @Override
-    public String getSavePath() {
-        return "saves/MainFrame.json";
-    }
-    
-    private boolean loadJSON()
-    {
-    	if (!checkFileExist("saves/MainFrame.json") || !checkFileExist("saves/game.json") || !checkFileExist("saves/log.json"))
-    		return false;
-    	
-    	JSONSaveLoader loader = new JSONSaveLoader();
-    	logInfo = loader.loadLogInfo("saves/log.json");
-    	gameFieldInfo = loader.loadGameInfo("saves/game.json");
-    	fieldInfo = loader.loadMainFrameInfo("saves/MainFrame.json");
-    	return true;
-    }
     
     private boolean checkFileExist(String name)
     {
@@ -309,7 +308,8 @@ public class MainApplicationFrame extends JFrame implements
         ConfirmDialog dialog = new ConfirmDialog();
         this.addWindowListener(dialog.showExitConfirmDialogJFrame(
         		resourceBundle.getString("exitMessage"), 
-        		resourceBundle.getString("exitAppTitle"))
+        		resourceBundle.getString("exitAppTitle"),
+        		null)
         );
 	}
 
@@ -321,5 +321,32 @@ public class MainApplicationFrame extends JFrame implements
 	@Override
 	public void executeFalse() {
 		createMainApplication();
+	}
+
+
+	@Override
+	public HashMap<String, Object> getWindowInfo() {
+		return null;
+	}
+
+	@Override
+	public String getFileName() {
+		return "MainFrameSaved.json";
+	}
+
+	@Override
+	public void doExitAction() {
+		windowsSaver.save();
+		
+	}
+
+	@Override
+	public boolean isIcon() {
+		return false;
+	}
+
+	@Override
+	public boolean isMaximised() {
+		return false;
 	}
 }

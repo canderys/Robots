@@ -14,22 +14,22 @@ import Localization.LanguageChangeable;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
-import serialization.IJsonSavable;
-import serialization.JSONSaveLoader;
-import serialization.LogFieldInfo;
-
+import serialization.ISavableWindow;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyVetoException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 public class LogWindow extends JInternalFrame implements LogChangeListener, 
-	IJsonSavable, LanguageChangeable, CloseInternalFrame
+	LanguageChangeable, CloseInternalFrame, ISavableWindow
 {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
     private LogEntry[] m_startContent;
-    private static ResourceBundle resourceBundle = ResourceBundleLoader.load("LogWindow");
-
+    public static ResourceBundle resourceBundle = ResourceBundleLoader.load("LogWindow");
     public LogWindow(LogWindowSource logSource) 
     {
         super(resourceBundle.getString("title"), true, true, true, true);
@@ -98,18 +98,6 @@ public class LogWindow extends JInternalFrame implements LogChangeListener,
         EventQueue.invokeLater(this::updateLogContent);
     }
 
-    @Override
-    public void saveJSON() {
-        JSONSaveLoader saver = new JSONSaveLoader();
-        LogFieldInfo info = saver.getLogFieldInfo(this);
-        saver.save(getSavePath(), info);
-    }
-
-    @Override
-    public String getSavePath() {
-        return "saves/log.json";
-    }
-
 	@Override
 	public void changeLanguage() {
 		resourceBundle = ResourceBundleLoader.load("LogWindow");
@@ -129,4 +117,54 @@ public class LogWindow extends JInternalFrame implements LogChangeListener,
 		 m_logSource.unregisterListener((LogChangeListener) e.getInternalFrame());
 		
 	}
+
+
+	@Override
+	public HashMap<String, Object> getWindowInfo() {
+		int arrayLen = 0;
+        Iterable<LogEntry> iter = this.getLogInfo();
+        LogEntry[] startContent = this.getStartContent();
+        if (startContent != null)
+	        for (LogEntry current : startContent)
+	        {
+	        	arrayLen++;
+	        }
+	        
+        for (LogEntry current : iter)
+        {
+        	arrayLen++;
+        }
+        LogEntry[] logInfo = new LogEntry[arrayLen];
+        iter = this.getLogInfo();
+        startContent = this.getStartContent();
+        int i = 0;
+        if (startContent != null)
+	        for (LogEntry current : startContent)
+	        {
+	            logInfo[i] = current;
+	            i++;
+	        }
+	        
+        for (LogEntry current : iter)
+        {
+            logInfo[i] = current;
+            i++;
+        }
+        System.out.print(logInfo.length);
+		HashMap<String, Object> info = new HashMap<String, Object>();
+        info.put("logEntry", logInfo);
+        
+        return info;
+	}
+
+	@Override
+	public String getFileName() {
+		return "LogWindowSave.json";
+	}
+
+	@Override
+	public boolean isMaximised() {
+		return this.isMaximum();
+	}
+	
 }

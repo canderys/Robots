@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.geom.Point2D;
 import java.beans.PropertyVetoException;
 import java.io.File;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import java.nio.file.Files;
@@ -18,15 +20,13 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import Localization.ResourceBundleLoader;
-import serialization.GameFieldInfo;
-import serialization.IJsonSavable;
-import serialization.JSONSaveLoader;
-
+import serialization.ISavableWindow;
+import serialization.WindowDescriptor;
 import Localization.LanguageChangeable;
 
-public class GameWindow extends JInternalFrame implements IJsonSavable, LanguageChangeable
+public class GameWindow extends JInternalFrame implements LanguageChangeable, ISavableWindow
 {
-    private final GameVisualizer m_visualizer;
+    private GameVisualizer m_visualizer;
     private static ResourceBundle resourceBundle = ResourceBundleLoader.load("GameWindow");
 
     public GameWindow() 
@@ -36,20 +36,23 @@ public class GameWindow extends JInternalFrame implements IJsonSavable, Language
         m_visualizer = new GameVisualizer();
         setUp();
     }
-
-    public GameWindow(GameFieldInfo info)
+    
+    public GameWindow(WindowDescriptor window)
     {
-        super(resourceBundle.getString("title"), true, true, true, true);
+    	super(resourceBundle.getString("title"), true, true, true, true);
+    	HashMap<String, Object> gameInfo = window.windowInfo;
         ResourceBundleLoader.addElementToUpdate(this);
-        this.setBounds(info.xCoord, info.yCoord, info.width, info.height);
+        this.setBounds(window.x, window.y,window.width, window.height);
         try
         {
-            setIcon(info.isIcon);
-            setMaximum(info.isMaximised);
+            setIcon(window.isIcon);
+            setMaximum(window.isMaximum);
         } catch (PropertyVetoException e) {
             e.printStackTrace();
         }
-        m_visualizer = new GameVisualizer(info.xRobot, info.yRobot, info.robotDirection, info.xTarget, info.yTarget);
+        m_visualizer = new GameVisualizer((double)gameInfo.get("xRobot"), (double)gameInfo.get("yRobot"), 
+        		(double)gameInfo.get("robotDirection"), (double)gameInfo.get("xTarget"), 
+        		(double)gameInfo.get("yTarget"));
         setUp();
     }
 
@@ -61,19 +64,6 @@ public class GameWindow extends JInternalFrame implements IJsonSavable, Language
     public Point2D.Double getTargerCoordinates()
     {
         return m_visualizer.getTargetCoordinates();
-    }
-
-    @Override
-    public void saveJSON()
-    {
-        JSONSaveLoader saver = new JSONSaveLoader();
-        GameFieldInfo info = saver.getGameFieldInfo(this);
-        saver.save(getSavePath(), info);
-    }
-
-    @Override
-    public String getSavePath() {
-        return "saves/game.json";
     }
 
     private void setUp()
@@ -102,5 +92,30 @@ public class GameWindow extends JInternalFrame implements IJsonSavable, Language
                 null)
         );
 		this.setTitle(resourceBundle.getString("title"));
+	}
+	
+	public String getId() {
+		return "Game";
+	}
+
+	public HashMap<String, Object> getWindowInfo() {
+		HashMap<String, Object> info = new HashMap<String, Object>();
+		RobotState state = this.getRobotState();
+		Point2D.Double target = this.getTargerCoordinates();
+		info.put("xRobot", state.x);
+		info.put("yRobot", state.y);
+		info.put("robotDirection", state.direction);
+		info.put("xTarget", target.x);
+		info.put("yTarget", target.y);
+		return info;
+	}
+	
+	public String getFileName() {
+		return "gameWindowSave.json";
+	}
+
+	@Override
+	public boolean isMaximised() {
+		return this.isMaximum();
 	}
 }
