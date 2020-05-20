@@ -10,7 +10,12 @@ public class RobotVisualiser
 
     public RobotVisualiser(double width, double height)
     {
-        fieldWidth = (int)width;
+        changeSize(width, height);
+    }
+    
+    public void changeSize(double width, double height)
+    {
+    	fieldWidth = (int)width;
         fieldHeight = (int)height;
     }
 

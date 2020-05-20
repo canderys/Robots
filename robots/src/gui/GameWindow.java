@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyVetoException;
 import java.io.File;
@@ -20,6 +22,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import Localization.ResourceBundleLoader;
+import model.GameModel;
 import serialization.ISavableWindow;
 import serialization.WindowDescriptor;
 import Localization.LanguageChangeable;
@@ -56,10 +59,16 @@ public class GameWindow extends JInternalFrame implements LanguageChangeable, IS
         setUp();
     }
 
+    public GameModel getGameModel()
+    {
+    	return m_visualizer.getGameModel();
+    }
+    
     public RobotState getRobotState()
     {
         return m_visualizer.getRobotState();
     }
+  
 
     public Point2D.Double getTargerCoordinates()
     {
@@ -78,6 +87,12 @@ public class GameWindow extends JInternalFrame implements LanguageChangeable, IS
                 resourceBundle.getString("exitAppTitle"),
                 null)
         );
+        this.addComponentListener(new ComponentAdapter() {
+        	public void componentResized(ComponentEvent e)
+        	{
+        		m_visualizer.changeSize(getWidth(), getHeight());
+        	}
+		});
         pack();
     }
 

@@ -19,6 +19,9 @@ import javax.swing.JPanel;
 public class GameVisualizer extends JPanel
 {
     private final Timer m_timer = initTimer();
+    
+    private double width;
+    private double height;
 
     private static Timer initTimer()
     {
@@ -31,8 +34,8 @@ public class GameVisualizer extends JPanel
 
     public GameVisualizer()
     {
-        double width = getWidth();
-        double height = getHeight();
+        //double width = getWidth();
+        //double height = getHeight();
         model = new GameModel(width, height);
         robotVisualiser = new RobotVisualiser(width, height);
         setUp();
@@ -40,11 +43,26 @@ public class GameVisualizer extends JPanel
 
     public GameVisualizer(double robotX, double robotY, double direction, double targerX, double targerY)
     {
-        double width = getWidth();
-        double height = getHeight();
+        //double width = getWidth();
+        //double height = getHeight();
         model = new GameModel(robotX, robotY, direction, targerX, targerY, width, height);
         robotVisualiser = new RobotVisualiser(width, height);
         setUp();
+    }
+    
+    public void changeSize(double w, double h)
+    {
+    	width = w;
+    	height = h;
+    	if (robotVisualiser != null)
+    		robotVisualiser.changeSize(width, height);
+    	if (model != null)
+    		model.setFieldSize(width, height);
+    }
+    
+    public GameModel getGameModel()
+    {
+    	return model;
     }
 
     public RobotState getRobotState()

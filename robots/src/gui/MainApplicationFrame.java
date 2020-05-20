@@ -81,13 +81,27 @@ public class MainApplicationFrame extends JFrame implements
         
     	LogWindow logWindow = createLogWindow(10, 10, 300, 800, null);
     	addWindow(logWindow);
+    	
     	GameWindow gameWindow = new GameWindow();
     	gameWindow.setSize(400,  400);
     	gameWindow.setLocation(10, 10);
         addWindow(gameWindow);
+        
+        CoordinatesWindow coordsWindow = new CoordinatesWindow(gameWindow.getGameModel());
+    	coordsWindow.setSize(200, 100);
+    	coordsWindow.setLocation(10, 10);
+    	addWindow(coordsWindow);
+    	
+    	DistanceWindow distanceWindow = new DistanceWindow(gameWindow.getGameModel());
+    	distanceWindow.setSize(200, 100);
+    	distanceWindow.setLocation(10, 10);
+    	addWindow(distanceWindow);
+        
         setJMenuBar(generateMenuBar());
         windowsSaver.registerWindow(logWindow, "log");
         windowsSaver.registerWindow(gameWindow, "game");
+        windowsSaver.registerWindow(coordsWindow, "coords");
+        windowsSaver.registerWindow(distanceWindow, "distance");
         windowsSaver.registerWindow(this, "main");
     }
     
@@ -134,8 +148,32 @@ public class MainApplicationFrame extends JFrame implements
         addWindow(gameWindow);
         setJMenuBar(generateMenuBar());
         
+        WindowDescriptor loadedCoordsWindow = windowsSaver.load(windowsSaver.getFileNameWindowById("coords"));
+        CoordinatesWindow coordsWindow = new CoordinatesWindow(gameWindow.getGameModel());
+        coordsWindow.setBounds(loadedCoordsWindow.x, loadedCoordsWindow.y, loadedCoordsWindow.width, loadedCoordsWindow.height);
+        try {
+        	coordsWindow.setIcon(loadedCoordsWindow.isIcon);
+        	coordsWindow.setMaximum(loadedCoordsWindow.isMaximum);
+		} catch (PropertyVetoException e) {
+			e.printStackTrace();
+		}
+    	addWindow(coordsWindow);
+    	
+    	WindowDescriptor loadedDistanceWindow = windowsSaver.load(windowsSaver.getFileNameWindowById("distance"));
+        DistanceWindow distanceWindow = new DistanceWindow(gameWindow.getGameModel());
+        distanceWindow.setBounds(loadedDistanceWindow.x, loadedDistanceWindow.y, loadedDistanceWindow.width, loadedDistanceWindow.height);
+        try {
+        	distanceWindow.setIcon(loadedDistanceWindow.isIcon);
+        	distanceWindow.setMaximum(loadedDistanceWindow.isMaximum);
+		} catch (PropertyVetoException e) {
+			e.printStackTrace();
+		}
+    	addWindow(distanceWindow);
+        
         windowsSaver.registerWindow(logWindow, "log");
         windowsSaver.registerWindow(gameWindow, "game");
+        windowsSaver.registerWindow(coordsWindow, "coords");
+        windowsSaver.registerWindow(distanceWindow, "distance");
         windowsSaver.registerWindow(this, "main");
         
     }

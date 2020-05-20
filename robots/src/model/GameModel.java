@@ -8,9 +8,8 @@ import java.awt.geom.Point2D;
 public class GameModel
 {
     private RobotModel robot;
-
-    private int m_targetPositionX;
-    private int m_targetPositionY;
+    
+    private TargetModel target;
 
     private double fieldWidth;
     private double fieldHeight;
@@ -20,9 +19,7 @@ public class GameModel
         robot = new RobotModel(100, 100, 0, width, height);
         fieldWidth = width;
         fieldHeight = height;
-
-        m_targetPositionX = 150;
-        m_targetPositionY = 150;
+        target = new TargetModel(150, 150);
     }
 
     public GameModel(double robotX, double robotY, double robotDirection,
@@ -31,26 +28,46 @@ public class GameModel
         robot = new RobotModel(robotX, robotY, robotDirection, width, height);
         fieldWidth = width;
         fieldHeight = height;
-        m_targetPositionX = (int)targetX;
-        m_targetPositionY = (int)targetY;
+        target = new TargetModel((int)targetX, (int)targetY);
+    }
+    
+    public void setFieldSize(double sizeX, double sizeY)
+    {
+    	fieldWidth = sizeX;
+    	fieldHeight = sizeY;
+    	robot.setFieldBorders(sizeX, sizeY);
     }
 
     public void setTargetPosition(Point p)
     {
-        m_targetPositionX = p.x;
-        m_targetPositionY = p.y;
+    	target.setPosition(p.x, p.y);
+    }
+    
+    public Point getTargetPosition()
+    {
+    	return target.getPosition();
     }
 
+    public RobotModel getRobotModel()
+    {
+    	return robot;
+    }
+    
+    public TargetModel getTargetModel()
+    {
+    	return target;
+    }
+    
     public void onModelUpdateEvent()
     {
         RobotState state = robot.getRobotState();
-        double distance = Geometry.distance(m_targetPositionX, m_targetPositionY, state.x, state.y);
+        double distance = Geometry.distance(target.getPosition().x, target.getPosition().y, state.x, state.y);
         if (distance < 0.5)
         {
             return;
         }
         double velocity = robot.getMaxVelocity();
-        double angleToTarget = Geometry.angleTo(state.x, state.y, m_targetPositionX, m_targetPositionY);
+        double angleToTarget = Geometry.angleTo(state.x, state.y, target.getPosition().x, target.getPosition().y);
         double angularVelocity = 0;
         if (angleToTarget > state.direction)
         {
@@ -70,6 +87,6 @@ public class GameModel
 
     public Point2D.Double getTargetCoordinates()
     {
-        return new Point2D.Double(m_targetPositionX, m_targetPositionY);
+        return new Point2D.Double(target.getPosition().x, target.getPosition().y);
     }
 }
