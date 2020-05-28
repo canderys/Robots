@@ -13,7 +13,7 @@ public class EnemyModel implements RobotObserver{
     private double fieldHeight;
     private RobotState state;
 
-    private static final double maxVelocity = 0.1;
+    private static final double maxVelocity = 0.03;
     private static final double maxAngularVelocity = 0.003;
     public static boolean isMeetPlayer = false;
 
@@ -64,6 +64,7 @@ public class EnemyModel implements RobotObserver{
         {
             newY = y + velocity * duration * Math.sin(direction);
         }
+        
         if (newX > fieldWidth)
             newX -= fieldWidth;
         else

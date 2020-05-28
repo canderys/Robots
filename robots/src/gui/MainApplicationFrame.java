@@ -376,7 +376,6 @@ public class MainApplicationFrame extends JFrame implements
 	@Override
 	public void doExitAction() {
 		windowsSaver.save();
-		
 	}
 
 	@Override

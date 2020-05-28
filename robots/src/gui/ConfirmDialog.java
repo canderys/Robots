@@ -13,12 +13,14 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+
+import Localization.LanguageChangeable;
 import Localization.ResourceBundleLoader;
 import serialization.LoadStatus;
 
 public class ConfirmDialog {
 	
-	private final static ResourceBundle resourceBundle = ResourceBundleLoader.load("ConfirmDialog");
+	private static ResourceBundle resourceBundle = ResourceBundleLoader.load("ConfirmDialog");
 	
 	public boolean showDialog(String exitMessage, String exitTitle)
 	{
@@ -27,7 +29,7 @@ public class ConfirmDialog {
 		options[1] = resourceBundle.getString("Disagree");
 		UIManager.put("OptionPane.yesButtonText", resourceBundle.getString("Agree"));
 		UIManager.put("OptionPane.noButtonText",resourceBundle.getString("Disagree"));
-		int result = JOptionPane.showConfirmDialog(null, exitMessage, exitTitle, 
+		int result = JOptionPane.showConfirmDialog(null, resourceBundle.getString(exitMessage), resourceBundle.getString(exitTitle), 
 				JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 		if (result == 0) {
 				return true;
@@ -62,10 +64,6 @@ public class ConfirmDialog {
             }
             return false;
 	}
-	
-	
-	
-	
 	
 	public InternalFrameAdapter showExitConfirmDialogJInternalFrame(String exitMessage, 
 			String exitTitle, CloseInternalFrame close)

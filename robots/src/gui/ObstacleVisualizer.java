@@ -42,14 +42,9 @@ public class ObstacleVisualizer {
 
     public void drawRObstacle(Graphics2D g, int x, int y, double direction)
     {
-        Polygon poly = new Polygon(POLY_X, POLY_Y, 8);
-        image = new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = (Graphics2D) image.getGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(ASTEROID_COLOR);
-        g2.fill(poly);
-        g2.dispose();
-        g.drawImage(image, x - 20, y, null);
+    	g.setColor(ASTEROID_COLOR);
+    	g.fillRect(x - 15, y - 15, 30, 30);
+    	g.drawRect(x - 15, y - 15, 30, 30);
     }
 
 }

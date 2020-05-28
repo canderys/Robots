@@ -84,11 +84,32 @@ public class GameModel
         initListObstacle(width, height);
     }
     
+    public void restartGame()
+    {
+    	robot.setX(100);
+    	robot.setY(100);
+    	robot.setD(0);
+    	
+    	enemyList.clear();
+    	obstacleList.clear();
+    	
+    	initListEnemy(fieldWidth, fieldHeight);
+    	initListObstacle(fieldWidth, fieldHeight);
+    	
+    	isGameOver = false;
+    	
+    	target.setPosition(150, 150);
+    }
+    
     public void setFieldSize(double sizeX, double sizeY)
     {
     	fieldWidth = sizeX;
     	fieldHeight = sizeY;
     	robot.setFieldBorders(sizeX, sizeY);
+    	for (EnemyModel enemy : enemyList)
+    	{
+    		enemy.setFieldBorders(sizeX, sizeY);
+    	}
     }
 
     public void setTargetPosition(Point p)
@@ -147,13 +168,13 @@ public class GameModel
     
     private void updateEnemy()
     {
+    	RobotState robotState = robot.getRobotState();
         for(EnemyModel enemy : enemyList)
         {
-        	RobotState state = enemy.getRobotState();
         	EnemyState stateEnemy = enemy.getEnemyState();
-        	double angleToPlayer = Geometry.angleTo(stateEnemy.x, stateEnemy.y, state.x, state.y);
-        	double distanceToPlayer = Geometry.distance(state.x, 
-        			state.y, stateEnemy.x, stateEnemy.y);
+        	double angleToPlayer = Geometry.angleTo(stateEnemy.x, stateEnemy.y, robotState.x, robotState.y);
+        	double distanceToPlayer = Geometry.distance(robotState.x, 
+        			robotState.y, stateEnemy.x, stateEnemy.y);
         	  if (distanceToPlayer < robot.getMinDistance())
               {
         		  isGameOver = true;
@@ -161,11 +182,11 @@ public class GameModel
               }
         	  double velocityEnemy = enemy.getMaxVelocity();
         	  double angularVelocityEnemy = 0;
-              if (angleToPlayer > state.direction)
+              if (angleToPlayer > stateEnemy.direction)
               {
             	  angularVelocityEnemy = enemy.getMaxAngularVelocity();
               }
-              if (angleToPlayer < state.direction)
+              if (angleToPlayer < stateEnemy.direction)
               {
             	  angularVelocityEnemy = -enemy.getMaxAngularVelocity();
               }
@@ -175,7 +196,7 @@ public class GameModel
               	double distanceToObstacle = Geometry.distance(pointToMove.x, pointToMove.y, obstacle.getX(), 
               			obstacle.getY());
               	if(distanceToObstacle < obstacle.getMinDistance()) {
-              		enemy.setD(Geometry.asNormalizedRadians(state.direction + Math.PI));
+              		enemy.setD(Geometry.asNormalizedRadians(robotState.direction + Math.PI));
               		pointToMove = enemy.moveEnemy(velocityEnemy, 0, 10);
               		break;
               	}

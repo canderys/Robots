@@ -164,9 +164,9 @@ public class GameVisualizer extends JPanel
                 if(model.isGameOver())
                 {
                 	ConfirmDialog dialog  = new ConfirmDialog();
-                	boolean isRestart = dialog.showDialog("Начать новую игру?", "Конец");
+                	boolean isRestart = dialog.showDialog("Restart", "GameOver");
                 	if(isRestart)
-                		model = new GameModel(width, height);
+                		model.restartGame();
                 	else
                 		System.exit(0);
                 }
