@@ -29,7 +29,7 @@ public class EnemyModel implements RobotObserver{
     
     public int getMinDistance()
     {
-    	return 10;
+    	return 8;
     }
     public void setD(double direction)
     {

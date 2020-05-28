@@ -27,8 +27,8 @@ public class ResourceBundleLoader {
 	
 	public static ResourceBundle load(String bundleName)
 	{
-		String dir = System.getProperty("user.dir") + File.separator + "localization";
-		//String dir = "robots/localization";
+		//String dir = System.getProperty("user.dir") + File.separator + "localization";
+		String dir = "robots/localization";
         File file = new File(dir);
         try {
         	URL[] urls = {file.toURI().toURL()};

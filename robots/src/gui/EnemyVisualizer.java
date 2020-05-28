@@ -23,9 +23,12 @@ public class EnemyVisualizer {
 
     public void drawEnemy(Graphics2D g, int x, int y, double direction)
     {
-    	Ellipse2D.Double circle = new Ellipse2D.Double(x, y, 15, 15);
+    	//Ellipse2D.Double circle = new Ellipse2D.Double(x, y, 15, 15);
+    	g.setColor(Color.black);
+    	drawOval(g, x, y, 15, 15);
     	g.setColor(Color.gray);
-    	g.fill(circle);
+    	fillOval(g, x, y, 15, 15);
+    	//g.fill(circle);
     }
 
     private static void fillOval(Graphics g, int centerX, int centerY, int diam1, int diam2)
