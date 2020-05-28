@@ -1,13 +1,16 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import java.nio.file.Files;
@@ -21,7 +24,12 @@ import javax.swing.JPanel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 import Localization.ResourceBundleLoader;
+import log.LogEntry;
+import log.LogLevel;
+import model.EnemyModel;
 import model.GameModel;
 import serialization.ISavableWindow;
 import serialization.WindowDescriptor;
@@ -53,9 +61,21 @@ public class GameWindow extends JInternalFrame implements LanguageChangeable, IS
         } catch (PropertyVetoException e) {
             e.printStackTrace();
         }
+        ArrayList<LinkedTreeMap>  list= (ArrayList<LinkedTreeMap>)gameInfo.get("listEnemy");
+        ArrayList<EnemyModel>  enemyList = new ArrayList<EnemyModel>();
+    	int i = 0;
+    	for(LinkedTreeMap enemy : list)
+    	{
+    		double x = (double) enemy.get("x");
+    		double y = (double)enemy.get("y");
+    		double direction = (double)enemy.get("direction");
+    		double width = (double)enemy.get("fieldWidth");
+    		double height = (double)enemy.get("fieldHeight");
+    		enemyList.add(new EnemyModel(x, y, direction, width, height));
+    	}
         m_visualizer = new GameVisualizer((double)gameInfo.get("xRobot"), (double)gameInfo.get("yRobot"), 
         		(double)gameInfo.get("robotDirection"), (double)gameInfo.get("xTarget"), 
-        		(double)gameInfo.get("yTarget"));
+        		(double)gameInfo.get("yTarget"), enemyList);
         setUp();
     }
 
@@ -122,6 +142,7 @@ public class GameWindow extends JInternalFrame implements LanguageChangeable, IS
 		info.put("robotDirection", state.direction);
 		info.put("xTarget", target.x);
 		info.put("yTarget", target.y);
+		info.put("listEnemy", m_visualizer.getGameModel().getEnemyList());
 		return info;
 	}
 	

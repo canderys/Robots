@@ -1,6 +1,8 @@
 package model;
 
 import gui.RobotState;
+
+import java.awt.Point;
 import java.util.ArrayList;
 
 public class RobotModel implements RobotObservable
@@ -27,8 +29,13 @@ public class RobotModel implements RobotObservable
 
         observers = new ArrayList<>();
     }
+    
+    public static int getMinDistance()
+    {
+    	return 20;
+    }
 
-    public void moveRobot(double velocity, double angularVelocity, double duration)
+    public DoublePoint moveRobot(double velocity, double angularVelocity, double duration)
     {
         velocity = Geometry.applyLimits(velocity, 0, maxVelocity);
         angularVelocity = Geometry.applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
@@ -65,6 +72,21 @@ public class RobotModel implements RobotObservable
 
         m_robotDirection = Geometry.asNormalizedRadians(m_robotDirection + angularVelocity * duration);
         notifyObservers();
+        return new DoublePoint(m_robotPositionX, m_robotPositionY);
+    }
+    
+    public void setX(double x)
+    {
+    	this.m_robotPositionX = x;
+    }
+    
+    public void setY(double y)
+    {
+    	this.m_robotPositionY = y;
+    }
+    public void setD(double d)
+    {
+    	m_robotDirection = d;
     }
 
     @Override
